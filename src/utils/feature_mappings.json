@@ -1,0 +1,152 @@
+{
+    "cap-shape": {
+        "x": "Convex",
+        "f": "Flat", 
+        "p": "Pointed",
+        "b": "Bell",
+        "c": "Conical",
+        "s": "Sunken",
+        "o": "Other"
+    },
+    "cap-surface": {
+        "g": "Grooves",
+        "h": "Smooth",
+        "t": "Scaly",
+        "y": "Shiny",
+        "e": "Even",
+        "s": "Silky",
+        "l": "Leathery",
+        "d": "Dull",
+        "w": "Wrinkled",
+        "i": "Fibrous",
+        "k": "Sticky"
+    },
+    "cap-color": {
+        "o": "Orange",
+        "e": "Red",
+        "n": "Brown",
+        "g": "Gray",
+        "r": "Green",
+        "w": "White",
+        "y": "Yellow",
+        "p": "Pink",
+        "u": "Purple",
+        "b": "Blue",
+        "l": "Black",
+        "k": "Dark"
+    },
+    "does-bruise-or-bleed": {
+        "f": "No",
+        "t": "Yes"
+    },
+    "gill-attachment": {
+        "e": "Free",
+        "a": "Attached",
+        "d": "Descending",
+        "s": "Sinuate",
+        "x": "None",
+        "p": "Partial",
+        "f": "Full"
+    },
+    "gill-spacing": {
+        "c": "Close",
+        "d": "Distant",
+        "f": "Crowded"
+    },
+    "gill-color": {
+        "w": "White",
+        "n": "Brown",
+        "p": "Pink",
+        "u": "Purple",
+        "b": "Blue",
+        "g": "Gray",
+        "y": "Yellow",
+        "r": "Green",
+        "e": "Red",
+        "o": "Orange",
+        "k": "Black",
+        "f": "Buff"
+    },
+    "stem-root": {
+        "s": "Swollen",
+        "b": "Bulbous",
+        "r": "Rooted",
+        "c": "Club",
+        "f": "Equal"
+    },
+    "stem-surface": {
+        "y": "Scaly",
+        "s": "Smooth",
+        "k": "Silky",
+        "i": "Fibrous",
+        "h": "Shiny",
+        "t": "Scaly Above Ring",
+        "g": "Grooved",
+        "f": "Flaky"
+    },
+    "stem-color": {
+        "w": "White",
+        "y": "Yellow",
+        "n": "Brown",
+        "u": "Purple",
+        "b": "Blue",
+        "l": "Black",
+        "r": "Green",
+        "p": "Pink",
+        "e": "Red",
+        "k": "Dark",
+        "g": "Gray",
+        "o": "Orange",
+        "f": "Buff"
+    },
+    "veil-type": {
+        "u": "Universal"
+    },
+    "veil-color": {
+        "w": "White",
+        "y": "Yellow",
+        "n": "Brown",
+        "e": "Red",
+        "u": "Purple",
+        "k": "Black"
+    },
+    "has-ring": {
+        "t": "Yes",
+        "f": "No"
+    },
+    "ring-type": {
+        "g": "Large",
+        "p": "Pendant",
+        "e": "Evanescent",
+        "l": "Large",
+        "f": "Flaring",
+        "m": "Movable",
+        "r": "Sheathing",
+        "z": "Zone"
+    },
+    "spore-print-color": {
+        "w": "White",
+        "p": "Purple",
+        "k": "Black",
+        "r": "Green",
+        "u": "Purple-Brown",
+        "n": "Brown",
+        "g": "Green"
+    },
+    "habitat": {
+        "d": "Deciduous Woods",
+        "m": "Meadows",
+        "g": "Grasses",
+        "h": "Heaths",
+        "l": "Leaves",
+        "p": "Paths",
+        "w": "Waste Places",
+        "u": "Urban"
+    },
+    "season": {
+        "w": "Winter",
+        "u": "Summer",
+        "a": "Autumn",
+        "s": "Spring"
+    }
+}

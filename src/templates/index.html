@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mushroom Classification AI</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #ffffff;
+            line-height: 1.5;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 0 30px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 500;
+            color: #ffffff;
+            margin-bottom: 8px;
+            letter-spacing: -0.01em;
+        }
+
+        .header .emoji {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 300;
+            margin: 0;
+        }
+
+        .warning {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(15px);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 16px;
+            text-align: center;
+            font-weight: 300;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .form-section {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(15px);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.2s ease;
+        }
+
+        .form-section:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        .form-section h3 {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 16px;
+            font-size: 1rem;
+            font-weight: 400;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.8rem;
+        }
+
+        .form-group label.required::after {
+            content: ' *';
+            color: #e17055;
+            font-weight: normal;
+        }
+
+        .form-group select, .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(10px);
+            transition: all 0.2s ease;
+            color: #ffffff;
+        }
+
+        .form-group select::placeholder, .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .form-group select:focus, .form-group input:focus {
+            outline: none;
+            border-color: #4a90e2;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .form-group select.error, .form-group input.error {
+            border-color: #e17055;
+        }
+
+        .form-group input[type="number"] {
+            appearance: textfield;
+            -moz-appearance: textfield;
+        }
+
+        .form-group input[type="number"]::-webkit-outer-spin-button,
+        .form-group input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .predict-btn, .random-btn {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+            color: rgba(255, 255, 255, 0.95);
+            padding: 14px 24px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 300;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            letter-spacing: 0.25px;
+        }
+
+        .predict-btn {
+            min-width: 180px;
+        }
+
+        .random-btn {
+            min-width: 140px;
+        }
+
+        .predict-btn:hover:not(:disabled), .random-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .predict-btn:disabled {
+            background: rgba(255, 255, 255, 0.03);
+            color: rgba(255, 255, 255, 0.3);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-container {
+            margin-top: 30px;
+            padding: 24px;
+            border-radius: 12px;
+            text-align: center;
+            display: none;
+            border: 1px solid;
+            backdrop-filter: blur(10px);
+        }
+
+        .result-edible {
+            background: rgba(45, 152, 218, 0.08);
+            border-color: rgba(45, 152, 218, 0.25);
+            color: #2d98da;
+        }
+
+        .result-poisonous {
+            background: rgba(225, 112, 85, 0.08);
+            border-color: rgba(225, 112, 85, 0.25);
+            color: #e17055;
+        }
+
+        .result-title {
+            font-size: 1.6rem;
+            margin-bottom: 18px;
+            font-weight: 400;
+        }
+
+        .result-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .result-item {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(15px);
+            padding: 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            max-width: 160px;
+        }
+
+        .result-item h4 {
+            font-size: 0.7rem;
+            margin-bottom: 4px;
+            opacity: 0.6;
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .result-item p {
+            font-size: 0.95rem;
+            font-weight: 400;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        .image-prompt-section {
+            margin-top: 20px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(15px);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            text-align: left;
+        }
+
+        .image-prompt-section h4 {
+            font-size: 0.9rem;
+            font-weight: 400;
+            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .prompt-text {
+            background: rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            padding: 12px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.75rem;
+            line-height: 1.3;
+            color: rgba(255, 255, 255, 0.8);
+            white-space: pre-wrap;
+            max-height: 120px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 300;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.18);
+        }
+
+        .copy-btn.copied {
+            background: rgba(45, 152, 218, 0.15);
+            border-color: rgba(45, 152, 218, 0.3);
+            color: #2d98da;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .spinner {
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-top: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: rgba(225, 112, 85, 0.08);
+            color: #e17055;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 16px;
+            display: none;
+            border: 1px solid rgba(225, 112, 85, 0.25);
+            backdrop-filter: blur(10px);
+        }
+
+        .footer {
+            margin-top: 60px;
+            padding: 24px 0;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .footer p {
+            margin: 0;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 300;
+        }
+
+        .footer .authors {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 4px;
+            font-weight: 400;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 16px;
+            }
+            
+            .header {
+                padding: 40px 0 30px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .result-details {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <span class="emoji">🍄</span>
+            <h1>Mushroom Classification AI</h1>
+            <p>Determine if a mushroom is edible or poisonous using machine learning</p>
+        </div>
+        
+        <div class="warning">
+            🍄 Educational tool only • Fill all fields for best accuracy • Never eat wild mushrooms based on predictions
+        </div>
+
+        <form id="mushroomForm">
+            <div class="form-grid">
+                <!-- Cap Characteristics -->
+                <div class="form-section">
+                    <h3>Cap Characteristics</h3>
+                    
+                    <div class="form-group">
+                        <label for="cap-diameter" class="required">Cap Diameter (cm)</label>
+                        <input type="number" id="cap-diameter" name="cap-diameter" 
+                               min="0" max="50" step="0.1" placeholder="e.g., 15.5" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="cap-shape" class="required">Cap Shape</label>
+                        <select id="cap-shape" name="cap-shape" required>
+                            <option value="">Select cap shape...</option>
+                            {% for key, value in feature_mappings['cap-shape'].items() %}
+                            <option value="{{ key }}">{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="cap-surface">Cap Surface</label>
+                        <select id="cap-surface" name="cap-surface">
+                            <option value="">Select cap surface...</option>
+                            {% for key, value in feature_mappings['cap-surface'].items() %}
+                            <option value="{{ key }}">{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="cap-color" class="required">Cap Color</label>
+                        <select id="cap-color" name="cap-color" required>
+                            <option value="">Select cap color...</option>
+                            {% for key, value in feature_mappings['cap-color'].items() %}
+                            <option value="{{ key }}">{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Gill Characteristics -->
+                <div class="form-section">
+                    <h3>Gill Characteristics</h3>
+                    
+                    <div class="form-group">
+                        <label for="gill-attachment">Gill Attachment</label>
+                        <select id="gill-attachment" name="gill-attachment">
+                            <option value="">Select gill attachment...</option>
+                            {% for key, value in feature_mappings['gill-attachment'].items() %}
+                            <option value="{{ key }}">{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="gill-spacing">Gill Spacing</label>
+                        <select id="gill-spacing" name="gill-spacing">
+                            <option value="">Select gill spacing...</option>
+                            {% for key, value in feature_mappings['gill-spacing'].items() %}
+                            <option value="{{ key }}">{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="gill-color">Gill Color</label>
+                        <select id="gill-color" name="gill-color">
+                            <option value="">Select gill color...</option>
+                            {% for key, value in feature_mappings['gill-color'].items() %}
+                            <option value="{{ key }}">{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Stem Characteristics -->
+                <div class="form-section">
+                    <h3>Stem Characteristics</h3>
+                    
+                    <div class="form-group">
+                        <label for="stem-height" class="required">Stem Height (cm)</label>
+                        <input type="number" id="stem-height" name="stem-height" 
+                               min="0" max="50" step="0.1" placeholder="e.g., 12.0" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="stem-width" class="required">Stem Width (mm)</label>
+                        <input type="number" id="stem-width" name="stem-width" 
+                               min="0" max="100" step="0.1" placeholder="e.g., 25.5" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="stem-root">Stem Root</label>
+                        <select id="stem-root" name="stem-root">
+                            <option value="">Select stem root...</option>
+                            {% for key, value in feature_mappings['stem-root'].items() %}
+                            <option value="{{ key }}">{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="stem-surface">Stem Surface</label>
+                        <select id="stem-surface" name="stem-surface">
+                            <option value="">Select stem surface...</option>
+                            {% for key, value in feature_mappings['stem-surface'].items() %}
+                            <option value="{{ key }}">{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="stem-color">Stem Color</label>
+                        <select id="stem-color" name="stem-color">
+                            <option value="">Select stem color...</option>
+                            {% for key, value in feature_mappings['stem-color'].items() %}
+                            <option value="{{ key }}">{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Additional Features -->
+                <div class="form-section">
+                    <h3>Additional Features</h3>
+                    
+                    <div class="form-group">
+                        <label for="has-ring">Has Ring</label>
+                        <select id="has-ring" name="has-ring">
+                            <option value="">Select ring presence...</option>
+                            {% for key, value in feature_mappings['has-ring'].items() %}
+                            <option value="{{ key }}">{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="ring-type">Ring Type</label>
+                        <select id="ring-type" name="ring-type">
+                            <option value="">Select ring type...</option>
+                            {% for key, value in feature_mappings['ring-type'].items() %}
+                            <option value="{{ key }}">{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="spore-print-color">Spore Print Color</label>
+                        <select id="spore-print-color" name="spore-print-color">
+                            <option value="">Select spore print color...</option>
+                            {% for key, value in feature_mappings['spore-print-color'].items() %}
+                            <option value="{{ key }}">{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="habitat" class="required">Habitat</label>
+                        <select id="habitat" name="habitat" required>
+                            <option value="">Select habitat...</option>
+                            {% for key, value in feature_mappings['habitat'].items() %}
+                            <option value="{{ key }}">{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="season">Season</label>
+                        <select id="season" name="season">
+                            <option value="">Select season...</option>
+                            {% for key, value in feature_mappings['season'].items() %}
+                            <option value="{{ key }}">{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Veil and Physical Features -->  
+                <div class="form-section">
+                    <h3>Veil & Physical Features</h3>
+                    
+                    <div class="form-group">
+                        <label for="veil-type">Veil Type</label>
+                        <select id="veil-type" name="veil-type">
+                            <option value="">Select veil type...</option>
+                            {% for key, value in feature_mappings['veil-type'].items() %}
+                            <option value="{{ key }}">{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="veil-color">Veil Color</label>
+                        <select id="veil-color" name="veil-color">
+                            <option value="">Select veil color...</option>
+                            {% for key, value in feature_mappings['veil-color'].items() %}
+                            <option value="{{ key }}">{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="does-bruise-or-bleed">Does Bruise or Bleed</label>
+                        <select id="does-bruise-or-bleed" name="does-bruise-or-bleed">
+                            <option value="">Select bruising...</option>
+                            {% for key, value in feature_mappings['does-bruise-or-bleed'].items() %}
+                            <option value="{{ key }}">{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="button-container">
+                <button type="button" class="random-btn" onclick="fillRandomValues()">Random Values</button>
+                <button type="submit" class="predict-btn">Classify Mushroom</button>
+            </div>
+        </form>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Analyzing mushroom characteristics...</p>
+        </div>
+
+        <div id="result" class="result-container">
+            <div id="result-title" class="result-title"></div>
+            <div id="result-details" class="result-details"></div>
+        </div>
+
+        <div id="error" class="error"></div>
+    </div>
+
+    <div class="container">
+        <div class="footer">
+            <p class="authors">Patru Gheorghe Eduard & Cristian Mihoc</p>
+            <p>&copy; 2025</p>
+        </div>
+    </div>
+
+    <script>
+        // Random values for testing
+        const randomValues = {
+            'cap-diameter': () => (Math.random() * 20 + 1).toFixed(1),
+            'cap-shape': ['b', 'c', 'x', 'f', 's', 'p'],
+            'cap-surface': ['s', 'y', 'l', 'g'],
+            'cap-color': ['n', 'b', 'c', 'g', 'r', 'p', 'u', 'e', 'w', 'y', 'l', 'o', 'k'],
+            'gill-attachment': ['a', 'd', 'f', 'n'],
+            'gill-spacing': ['c', 'w', 'd'],
+            'gill-color': ['k', 'n', 'b', 'h', 'g', 'r', 'o', 'p', 'u', 'e', 'w', 'y'],
+            'stem-height': () => (Math.random() * 15 + 1).toFixed(1),
+            'stem-width': () => (Math.random() * 30 + 5).toFixed(1),
+            'stem-root': ['b', 'c', 'u', 'e', 'z', 'r'],
+            'stem-surface': ['s', 'y', 'k', 't'],
+            'stem-color': ['n', 'b', 'c', 'g', 'o', 'p', 'e', 'w', 'y'],
+            'has-ring': ['f', 't'],
+            'ring-type': ['c', 'e', 'f', 'l', 'n', 'p', 's', 'z'],
+            'spore-print-color': ['k', 'n', 'b', 'h', 'r', 'o', 'u', 'w', 'y'],
+            'habitat': ['g', 'l', 'm', 'p', 'h', 'u', 'w', 'd'],
+            'season': ['s', 'u', 'a', 'w'],
+            'veil-type': ['p', 'u'],
+            'veil-color': ['n', 'o', 'w', 'y'],
+            'does-bruise-or-bleed': ['f', 't']
+        };
+
+        function fillRandomValues() {
+            Object.keys(randomValues).forEach(fieldName => {
+                const field = document.getElementById(fieldName);
+                if (field) {
+                    const values = randomValues[fieldName];
+                    if (typeof values === 'function') {
+                        field.value = values();
+                    } else if (Array.isArray(values)) {
+                        field.value = values[Math.floor(Math.random() * values.length)];
+                    }
+                    field.classList.remove('error');
+                }
+            });
+        }
+
+        // Form validation function
+        function validateForm() {
+            const requiredFields = document.querySelectorAll('[required]');
+            let isValid = true;
+            
+            requiredFields.forEach(field => {
+                field.classList.remove('error');
+                if (!field.value.trim()) {
+                    field.classList.add('error');
+                    isValid = false;
+                }
+            });
+            
+            return isValid;
+        }
+
+        // Add validation styling on focus/blur
+        document.querySelectorAll('[required]').forEach(field => {
+            field.addEventListener('blur', function() {
+                if (!this.value.trim()) {
+                    this.classList.add('error');
+                } else {
+                    this.classList.remove('error');
+                }
+            });
+            
+            field.addEventListener('input', function() {
+                if (this.value.trim()) {
+                    this.classList.remove('error');
+                }
+            });
+        });
+
+        document.getElementById('mushroomForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Validate form first
+            if (!validateForm()) {
+                const error = document.getElementById('error');
+                error.textContent = 'Please fill in all required fields (marked with *)';
+                error.style.display = 'block';
+                setTimeout(() => {
+                    error.style.display = 'none';
+                }, 5000);
+                return;
+            }
+            
+            const formData = new FormData(this);
+            const submitBtn = document.querySelector('.predict-btn');
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+            const error = document.getElementById('error');
+            
+            // Show loading
+            submitBtn.disabled = true;
+            loading.style.display = 'block';
+            result.style.display = 'none';
+            error.style.display = 'none';
+            
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Show results
+                    const resultTitle = document.getElementById('result-title');
+                    const resultDetails = document.getElementById('result-details');
+                    
+                    resultTitle.textContent = data.prediction === 'Edible' ? '✓ Edible' : '✗ Poisonous';
+                    
+                    result.className = 'result-container ' + (data.prediction === 'Edible' ? 'result-edible' : 'result-poisonous');
+                    
+                    let detailsHTML = `
+                        <div class="result-item">
+                            <h4>Edible Probability</h4>
+                            <p>${data.edible_probability}%</p>
+                        </div>
+                        <div class="result-item">
+                            <h4>Poisonous Probability</h4>
+                            <p>${data.poisonous_probability}%</p>
+                        </div>
+                        <div class="result-item">
+                            <h4>Confidence</h4>
+                            <p>${data.confidence}%</p>
+                        </div>
+                        <div class="result-item">
+                            <h4>Confidence Level</h4>
+                            <p>${data.confidence_level}</p>
+                        </div>
+                    `;
+                    
+                    if (data.warning) {
+                        detailsHTML += `
+                            <div class="result-item" style="grid-column: 1/-1; background: rgba(225, 112, 85, 0.08); border: 1px solid rgba(225, 112, 85, 0.25); max-width: none;">
+                                <h4 style="color: #e17055;">⚠️ Warning</h4>
+                                <p style="font-size: 0.85rem; color: #e17055;">${data.warning}</p>
+                            </div>
+                        `;
+                    }
+                    
+                    resultDetails.innerHTML = detailsHTML;
+                    
+                    // Add ChatGPT image prompt section
+                    if (data.image_prompt) {
+                        const imagePromptSection = `
+                            <div class="image-prompt-section">
+                                <h4>🎨 Generate Image</h4>
+                                <p style="margin-bottom: 10px; font-size: 0.8rem; color: rgba(255, 255, 255, 0.6); line-height: 1.3;">
+                                    Copy this prompt for ChatGPT/DALL-E:
+                                </p>
+                                <div class="prompt-text" id="imagePrompt">${data.image_prompt}</div>
+                                <button type="button" class="copy-btn" onclick="copyPrompt()">Copy</button>
+                            </div>
+                        `;
+                        resultDetails.innerHTML += imagePromptSection;
+                    }
+                    
+                    result.style.display = 'block';
+                } else {
+                    throw new Error(data.error || 'Unknown error occurred');
+                }
+            } catch (err) {
+                error.textContent = 'Error: ' + err.message;
+                error.style.display = 'block';
+            } finally {
+                loading.style.display = 'none';
+                submitBtn.disabled = false;
+            }
+        });
+
+        function copyPrompt() {
+            const promptText = document.getElementById('imagePrompt').textContent;
+            const copyBtn = document.querySelector('.copy-btn');
+            
+            navigator.clipboard.writeText(promptText).then(() => {
+                copyBtn.textContent = 'Copied!';
+                copyBtn.classList.add('copied');
+                
+                setTimeout(() => {
+                    copyBtn.textContent = 'Copy';
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = promptText;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                copyBtn.textContent = 'Copied!';
+                copyBtn.classList.add('copied');
+                
+                setTimeout(() => {
+                    copyBtn.textContent = 'Copy';
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
