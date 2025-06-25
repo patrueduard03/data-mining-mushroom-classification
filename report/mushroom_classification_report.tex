@@ -74,7 +74,7 @@
 \begin{abstract}
 This study addresses the critical problem of mushroom classification, distinguishing between edible and poisonous varieties using machine learning techniques. The primary objectives are to develop an accurate binary classifier and identify the most important morphological attributes that determine mushroom toxicity. We employed a comprehensive data mining workflow on the Kaggle mushroom dataset, consisting of 61,069 samples with 20 morphological features.
 
-Our methodology combines exploratory data analysis, feature engineering, and advanced machine learning models, specifically CatBoost\,\cite{prokhorenkova2018catboost}, enhanced with hyperparameter optimization using Optuna. The approach achieves exceptional performance with a ROC-AUC score of 1.0, significantly outperforming baseline logistic regression (ROC-AUC: 0.9416). Through explainability analysis using SHAP values and permutation importance, we identified odor, gill-color, and spore-print-color as the most critical features for mushroom toxicity prediction.
+Our methodology combines exploratory data analysis, feature engineering, and advanced machine learning models, specifically CatBoost\,\cite{prokhorenkova2018catboost}, enhanced with hyperparameter optimization using Optuna. The approach achieves exceptional performance with a ROC-AUC score of 1.0, significantly outperforming baseline logistic regression (ROC-AUC: 0.9416). Through explainability analysis using SHAP values and permutation importance, we identified gill-spacing, stem-color, and gill-color as the most critical features for mushroom toxicity prediction.
 
 The results demonstrate the effectiveness of gradient boosting methods for this classification task and provide valuable insights into the morphological characteristics that distinguish edible from poisonous mushrooms, with potential applications in mycological research and public safety.
 \end{abstract}
@@ -128,7 +128,7 @@ The dataset contains both numerical and categorical features:
 \end{itemize}
 
 \textbf{Categorical Features (17):}
-Including \texttt{cap-shape}, \texttt{cap-surface}, \texttt{cap-color}, \texttt{gill-attachment}, \texttt{gill-spacing}, \texttt{gill-color}, \texttt{odor}, \texttt{stem-root}, \texttt{stem-surface}, \texttt{stem-color}, \texttt{veil-type}, \texttt{veil-color}, \texttt{has-ring}, \texttt{ring-type}, \texttt{spore-print-color}, \texttt{habitat}, and \texttt{season}.
+Including \texttt{cap-shape}, \texttt{cap-surface}, \texttt{cap-color}, \texttt{does-bruise-or-bleed}, \texttt{gill-attachment}, \texttt{gill-spacing}, \texttt{gill-color}, \texttt{stem-root}, \texttt{stem-surface}, \texttt{stem-color}, \texttt{veil-type}, \texttt{veil-color}, \texttt{has-ring}, \texttt{ring-type}, \texttt{spore-print-color}, \texttt{habitat}, and \texttt{season}.
 
 \begin{figure}[H]
     \centering
@@ -344,9 +344,9 @@ SHAP (SHapley Additive exPlanations) provides both global and local explanations
 The explainability analysis reveals several critical insights:
 
 \begin{enumerate}
-    \item \textbf{Odor emerges as the most important feature} across all importance metrics, suggesting that smell is the primary indicator of mushroom toxicity.
-    \item \textbf{Gill-color and spore-print-color} rank consistently high, indicating that visual characteristics of reproductive structures are crucial for classification.
-    \item \textbf{Cap-surface and stem-root} provide secondary but significant discriminative power.
+    \item \textbf{Gill-spacing emerges as the most important feature} across all importance metrics, suggesting that the spacing between gills is the primary indicator of mushroom toxicity.
+    \item \textbf{Stem-color and gill-color} rank consistently high, indicating that visual characteristics of both stem and gill structures are crucial for classification.
+    \item \textbf{Cap-surface and gill-attachment} provide secondary but significant discriminative power.
     \item \textbf{Habitat and season} show moderate importance, suggesting environmental factors contribute to toxicity patterns.
 \end{enumerate}
 
@@ -363,7 +363,7 @@ This study successfully developed a highly accurate mushroom classification syst
 
 \begin{enumerate}
     \item \textbf{Model Performance}: CatBoost significantly outperformed the logistic-regression baseline, demonstrating the value of gradient-boosting methods for this classification task.
-    \item \textbf{Feature Importance}: Odor consistently emerged as the most critical feature across all explainability methods, aligning with mycological expertise that emphasizes smell as a primary toxicity indicator.
+    \item \textbf{Feature Importance}: Gill-spacing consistently emerged as the most critical feature across all explainability methods, followed by stem-color and gill-color, highlighting the importance of gill and stem characteristics for toxicity classification.
     \item \textbf{Explainability}: The comprehensive explainability analysis provides actionable insights for both automated systems and human experts, enhancing trust and understanding of model decisions.
     \item \textbf{Practical Implications}: The high accuracy and interpretability make this approach suitable for real-world applications, including mobile identification apps and educational tools.
 \end{enumerate}
