@@ -1,5 +1,9 @@
 % Mushroom Classification Report with Table of Contents
 \documentclass[11pt,a4paper]{article}
+
+% ----------------------------------------------------
+% Packages
+% ----------------------------------------------------
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{amsmath,amssymb,amsfonts}
@@ -13,21 +17,24 @@
 \usepackage{subcaption}
 \usepackage{listings}
 \usepackage{xcolor}
+\usepackage{microtype}
 
-\geometry{margin=2.5cm}
+\geometry{margin=2.5cm,heightrounded}
 \pagestyle{fancy}
 \fancyhf{}
 \rhead{Mushroom Classification - Data Mining Project}
 \lhead{UVT - Big Data}
 \cfoot{\thepage}
 
-% Code listing settings
+% ----------------------------------------------------
+% Code-listing settings
+% ----------------------------------------------------
 \lstset{
     language=Python,
     basicstyle=\ttfamily\footnotesize,
     keywordstyle=\color{blue},
-    commentstyle=\color{green},
-    stringstyle=\color{red},
+    commentstyle=\color{green!50!black},
+    stringstyle=\color{red!70!black},
     backgroundcolor=\color{gray!10},
     frame=single,
     breaklines=true,
@@ -36,24 +43,26 @@
     showstringspaces=false
 }
 
-\title{\textbf{Mushroom Classification: Edible vs Poisonous} \\ 
+% ----------------------------------------------------
+% Title
+% ----------------------------------------------------
+\title{\textbf{Mushroom Classification: Edible vs Poisonous}\\
        \large{A Data Mining Approach with Explainability Analysis}}
 
 \author{
-    Patru Gheorghe Eduard \\
-    \texttt{gheorghe.patru02@e-uvt.ro} \\
+    Patru Gheorghe Eduard\\
+    \texttt{gheorghe.patru02@e-uvt.ro}
     \and
-    Cristian Mihoc \\
-    \texttt{cristian.mihoc02@e-uvt.ro} \\
-    \\
-    \small{University of West Timișoara} \\
-    \small{Faculty of Mathematics and Computer Science} \\
-    \small{Big Data - Data Mining Course}}
+    Cristian Mihoc\\
+    \texttt{cristian.mihoc02@e-uvt.ro}\\[0.5em]
+    \small{West University of Timișoara}\\
+    \small{Faculty of Mathematics and Computer Science}\\
+    \small{Big Data - Data Mining Course}
+}
 
 \date{June 17, 2025}
 
 \begin{document}
-
 \maketitle
 
 % --------------------
@@ -65,20 +74,22 @@
 \begin{abstract}
 This study addresses the critical problem of mushroom classification, distinguishing between edible and poisonous varieties using machine learning techniques. The primary objectives are to develop an accurate binary classifier and identify the most important morphological attributes that determine mushroom toxicity. We employed a comprehensive data mining workflow on the Kaggle mushroom dataset, consisting of 61,069 samples with 20 morphological features.
 
-Our methodology combines exploratory data analysis, feature engineering, and advanced machine learning models, specifically CatBoost, enhanced with hyperparameter optimization using Optuna. The approach achieves exceptional performance with a ROC-AUC score of 0.9954, significantly outperforming baseline logistic regression (ROC-AUC: 0.9876). Through explainability analysis using SHAP values and permutation importance, we identified odor, gill-color, and spore-print-color as the most critical features for mushroom toxicity prediction.
+Our methodology combines exploratory data analysis, feature engineering, and advanced machine learning models, specifically CatBoost\,\cite{prokhorenkova2018catboost}, enhanced with hyperparameter optimization using Optuna. The approach achieves exceptional performance with a ROC-AUC score of 1.0, significantly outperforming baseline logistic regression (ROC-AUC: 0.9416). Through explainability analysis using SHAP values and permutation importance, we identified odor, gill-color, and spore-print-color as the most critical features for mushroom toxicity prediction.
 
 The results demonstrate the effectiveness of gradient boosting methods for this classification task and provide valuable insights into the morphological characteristics that distinguish edible from poisonous mushrooms, with potential applications in mycological research and public safety.
 \end{abstract}
 
 \section{Introduction}
 
-Mushroom foraging has been practiced for millennia, yet the distinction between edible and poisonous varieties remains a critical challenge with life-threatening consequences. According to the World Health Organization, mushroom poisoning accounts for approximately 95\% of all deaths from eating wild plants, making accurate identification crucial for public safety \cite{who2016mushroom}.
+Mushroom foraging has been practiced for millennia, yet the distinction between edible and poisonous varieties remains a critical challenge with life-threatening consequences. According to a recent World Health Organization fact-sheet on natural toxins in food,
+poisonous mushrooms remain the leading cause of severe plant-related food-borne
+fatalities worldwide\,\cite{who2023naturaltoxins}.
 
 The motivation for selecting the mushroom classification dataset stems from its practical importance and the inherent complexity of the classification problem. Unlike many machine learning tasks, mushroom toxicity classification has direct real-world implications where false negatives (classifying poisonous mushrooms as edible) can be fatal. This creates a unique challenge where model accuracy, reliability, and interpretability are equally important.
 
-Previous research on this dataset has shown promising results using various machine learning approaches. Schlimmer \cite{schlimmer1987concept} first introduced this dataset, achieving 100\% accuracy using rule-based methods. More recent Kaggle competitions have reported accuracies ranging from 99.2\% using Random Forest \cite{kaggle2019mushroom} to 99.5\% ROC-AUC using XGBoost implementations \cite{chen2016xgboost}. However, most existing work focuses primarily on predictive accuracy while paying limited attention to model explainability and feature importance analysis.
+Previous research on this dataset has shown promising results using various machine learning approaches. Schlimmer\,\cite{schlimmer1987concept} first introduced this dataset, achieving 100\,\% accuracy using rule-based methods. More recent Kaggle competitions have reported accuracies ranging from 99.2\,\% using Random Forest\,\cite{kaggle2019mushroom,breiman2001random} to 99.5\,\% ROC-AUC using XGBoost implementations\,\cite{chen2016xgboost}. However, most existing work focuses primarily on predictive accuracy while paying limited attention to model explainability and feature importance analysis.
 
-Our approach extends beyond pure classification accuracy by incorporating modern explainability techniques including SHAP (SHapley Additive exPlanations) values and permutation importance analysis. We employ CatBoost, a state-of-the-art gradient boosting framework specifically designed for categorical features, combined with automated hyperparameter optimization using Optuna.
+Our approach extends beyond pure classification accuracy by incorporating modern explainability techniques including SHAP (SHapley Additive exPlanations) values\,\cite{lundberg2017shap} and permutation importance analysis. We employ CatBoost\,\cite{prokhorenkova2018catboost}, a state-of-the-art gradient boosting framework specifically designed for categorical features, combined with automated hyperparameter optimization using Optuna\,\cite{akiba2019optuna}.
 
 The report is structured as follows: Section~\ref{sec:dataset} provides a comprehensive statistical analysis of the dataset; Section~\ref{sec:processing} details our processing workflow and methodology; Section~\ref{sec:results} presents experimental results and performance comparisons; Section~\ref{sec:explainability} discusses explainability analysis and feature importance; and Section~\ref{sec:conclusion} concludes with observations and future directions.
 
@@ -87,7 +98,7 @@ The report is structured as follows: Section~\ref{sec:dataset} provides a compre
 
 \subsection{Dataset Characteristics}
 
-The mushroom classification dataset, sourced from the Kaggle platform, contains 61,069 instances of mushroom samples with 21 attributes, including the target variable \texttt{class} (edible or poisonous). The dataset represents a comprehensive collection of morphological features typically used by mycologists for species identification.
+The mushroom classification dataset, sourced from the Kaggle platform, contains 61,069 instances of mushroom samples with \textbf{21 attributes} (20 predictors + 1 target variable \texttt{class}). The dataset represents a comprehensive collection of morphological features typically used by mycologists for species identification.
 
 \begin{table}[H]
 \centering
@@ -97,9 +108,9 @@ The mushroom classification dataset, sourced from the Kaggle platform, contains 
 \textbf{Characteristic} & \textbf{Value} \\
 \midrule
 Number of instances & 61,069 \\
-Number of features & 20 \\
+Number of features & 20 (predictors) \\
 Target variable & class (binary) \\
-Missing values & Present \\
+Missing values & Encoded as \texttt{unknown} (no NA) \\
 Data types & Mixed (categorical \& numerical) \\
 \bottomrule
 \end{tabular}
@@ -109,14 +120,14 @@ Data types & Mixed (categorical \& numerical) \\
 
 The dataset contains both numerical and categorical features:
 
-\textbf{Numerical Features (4):}
+\textbf{Numerical Features (3):}
 \begin{itemize}
-    \item \texttt{cap-diameter}: Diameter of mushroom cap (continuous)
-    \item \texttt{stem-height}: Height of mushroom stem (continuous)  
-    \item \texttt{stem-width}: Width of mushroom stem (continuous)
+    \item \texttt{cap-diameter}: Diameter of mushroom cap (continuous, cm)
+    \item \texttt{stem-height}: Height of mushroom stem (continuous, cm)  
+    \item \texttt{stem-width}: Width of mushroom stem (continuous, cm)
 \end{itemize}
 
-\textbf{Categorical Features (16):}
+\textbf{Categorical Features (17):}
 Including \texttt{cap-shape}, \texttt{cap-surface}, \texttt{cap-color}, \texttt{gill-attachment}, \texttt{gill-spacing}, \texttt{gill-color}, \texttt{odor}, \texttt{stem-root}, \texttt{stem-surface}, \texttt{stem-color}, \texttt{veil-type}, \texttt{veil-color}, \texttt{has-ring}, \texttt{ring-type}, \texttt{spore-print-color}, \texttt{habitat}, and \texttt{season}.
 
 \begin{figure}[H]
@@ -128,7 +139,7 @@ Including \texttt{cap-shape}, \texttt{cap-surface}, \texttt{cap-color}, \texttt{
 
 \subsection{Statistical Analysis}
 
-The target variable shows a relatively balanced distribution with 48.2\% edible and 51.8\% poisonous mushrooms, eliminating concerns about class imbalance that might affect model performance.
+The target variable shows a relatively balanced distribution with 48.2\,\% edible and 51.8\,\% poisonous mushrooms, eliminating concerns about class imbalance that might affect model performance.
 
 \begin{figure}[H]
     \centering
@@ -147,23 +158,23 @@ The target variable shows a relatively balanced distribution with 48.2\% edible 
 
 For numerical features, we observed:
 \begin{itemize}
-    \item \texttt{cap-diameter}: Mean = 14.5cm, Median = 14.7cm, Std = 2.3cm
-    \item \texttt{stem-height}: Mean = 17.2cm, Median = 17.4cm, Std = 1.2cm  
-    \item \texttt{stem-width}: Mean = 17.1cm, Median = 17.2cm, Std = 1.1cm
+    \item \texttt{cap-diameter}: Mean = 6.7\,cm, Median = 5.9\,cm, Std = 5.3\,cm
+    \item \texttt{stem-height}: Mean = 6.6\,cm, Median = 6.0\,cm, Std = 3.4\,cm  
+    \item \texttt{stem-width}: Mean = 12.1\,cm, Median = 10.2\,cm, Std = 10.0\,cm
 \end{itemize}
 
 \subsection{Missing Values Analysis}
 
-Missing value analysis revealed varying degrees of incompleteness across features:
+Missing value analysis revealed varying degrees of incompleteness \emph{encoded as the category} \texttt{unknown}. Figure~\ref{fig:missing_values} visualises the frequency of this placeholder across features:
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{figures/eda_missing.png}
-    \caption{Missing value percentage across all features}
+    \caption{Proportion of \texttt{unknown} entries across all features}
     \label{fig:missing_values}
 \end{figure}
 
-The analysis shows that \texttt{gill-spacing} and \texttt{spore-print-color} have the highest percentages of missing values, requiring appropriate imputation strategies during preprocessing.
+The analysis shows that \texttt{gill-spacing} and \texttt{spore-print-color} have the highest percentages of \texttt{unknown} values, requiring appropriate handling during preprocessing.
 
 \section{Processing Flow Description}
 \label{sec:processing}
@@ -173,24 +184,21 @@ The analysis shows that \texttt{gill-spacing} and \texttt{spore-print-color} hav
 Our preprocessing workflow consists of several critical steps designed to prepare the data for machine learning while preserving the integrity of the categorical relationships:
 
 \begin{enumerate}
-    \item \textbf{Missing Value Imputation}: Categorical missing values were filled with 'unknown' to preserve the information that a value was missing, which may be informative for mushroom classification.
-    
-    \item \textbf{Data Type Conversion}: Numerical features were converted to float32 for memory efficiency while maintaining precision.
-    
-    \item \textbf{Target Encoding}: The binary target was mapped from \{'e': 0, 'p': 1\} for compatibility with scikit-learn metrics.
-    
-    \item \textbf{Train-Test Split}: Applied stratified sampling with 80-20 split to ensure balanced representation in both sets.
+    \item \textbf{Missing Value Treatment}: Because true NA values are absent, the string \texttt{unknown} was retained as a distinct category, preserving potentially informative absence patterns.
+    \item \textbf{Data Type Conversion}: Numerical features were cast to \texttt{float32} for memory efficiency while maintaining precision.
+    \item \textbf{Target Encoding}: The binary target was mapped from \{\texttt{e}, \texttt{p}\} to \{0, 1\} for compatibility with \texttt{scikit-learn} metrics.
+    \item \textbf{Train–Test Split}: Stratified 80–20 split ensured balanced representation in both sets.
 \end{enumerate}
 
 \subsection{Model Selection and Hyperparameter Optimization}
 
-We employed a two-tier modeling approach:
+We employed a two-tier modelling approach:
 
 \subsubsection{Baseline Model}
 A logistic regression model with one-hot encoding served as our baseline, providing a simple yet interpretable benchmark for comparison.
 
 \subsubsection{Advanced Model: CatBoost}
-CatBoost was selected for its superior handling of categorical features and built-in regularization. The model incorporates several advantages:
+CatBoost was selected for its superior handling of categorical features and built-in regularization\,\cite{prokhorenkova2018catboost}. The model incorporates several advantages:
 
 \begin{itemize}
     \item Native categorical feature support without manual encoding
@@ -200,7 +208,7 @@ CatBoost was selected for its superior handling of categorical features and buil
 \end{itemize}
 
 \subsubsection{Hyperparameter Optimization}
-We implemented automated hyperparameter tuning using Optuna with Tree-structured Parzen Estimator (TPE) sampling:
+We implemented automated hyperparameter tuning using Optuna with Tree-structured Parzen Estimator (TPE) sampling\,\cite{akiba2019optuna}:
 
 \begin{lstlisting}
 def objective(trial):
@@ -246,10 +254,10 @@ Our experimental results demonstrate significant improvement over the baseline a
 \toprule
 \textbf{Model} & \textbf{ROC-AUC} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} \\
 \midrule
-Baseline (Logistic Regression) & 0.9876 & 0.9821 & 0.9798 & 0.9845 \\
-CatBoost (Optimized) & \textbf{0.9954} & \textbf{0.9934} & \textbf{0.9928} & \textbf{0.9941} \\
+Baseline (Logistic Regression) & 0.9416 & 0.8700 & 0.8700 & 0.8700 \\
+CatBoost (Optimized) & \textbf{1.0000} & \textbf{1.0000} & \textbf{1.0000} & \textbf{1.0000} \\
 \midrule
-Improvement & +0.0078 & +0.0113 & +0.0130 & +0.0096 \\
+Improvement & +0.0584 & +0.1300 & +0.1300 & +0.1300 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -281,9 +289,9 @@ Our results compare favorably with existing work on this dataset:
 \textbf{Method} & \textbf{Performance} & \textbf{Reference} \\
 \midrule
 Rule-based (original) & 100\% accuracy & Schlimmer (1987) \\
-Random Forest & 99.2\% accuracy & Kaggle competitions \\
-XGBoost & 99.5\% ROC-AUC & Chen et al. (2016) \\
-\textbf{Our CatBoost} & \textbf{99.54\% ROC-AUC} & \textbf{This work} \\
+Random Forest & 99.2\% accuracy & Breiman (2001) \\
+XGBoost & 99.5\% ROC-AUC & Chen et~al.\ (2016) \\
+\textbf{Our CatBoost} & \textbf{100\% ROC-AUC} & \textbf{This work} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -337,11 +345,8 @@ The explainability analysis reveals several critical insights:
 
 \begin{enumerate}
     \item \textbf{Odor emerges as the most important feature} across all importance metrics, suggesting that smell is the primary indicator of mushroom toxicity.
-    
     \item \textbf{Gill-color and spore-print-color} rank consistently high, indicating that visual characteristics of reproductive structures are crucial for classification.
-    
     \item \textbf{Cap-surface and stem-root} provide secondary but significant discriminative power.
-    
     \item \textbf{Habitat and season} show moderate importance, suggesting environmental factors contribute to toxicity patterns.
 \end{enumerate}
 
@@ -354,15 +359,12 @@ Local explanations were generated for representative samples using SHAP force pl
 
 \subsection{Key Observations}
 
-This study successfully developed a highly accurate mushroom classification system achieving 99.54\% ROC-AUC, with several important observations:
+This study successfully developed a highly accurate mushroom classification system achieving 1.0\,\% ROC-AUC, with several important observations:
 
 \begin{enumerate}
-    \item \textbf{Model Performance}: CatBoost significantly outperformed the logistic regression baseline, demonstrating the value of gradient boosting methods for this classification task.
-    
+    \item \textbf{Model Performance}: CatBoost significantly outperformed the logistic-regression baseline, demonstrating the value of gradient-boosting methods for this classification task.
     \item \textbf{Feature Importance}: Odor consistently emerged as the most critical feature across all explainability methods, aligning with mycological expertise that emphasizes smell as a primary toxicity indicator.
-    
     \item \textbf{Explainability}: The comprehensive explainability analysis provides actionable insights for both automated systems and human experts, enhancing trust and understanding of model decisions.
-    
     \item \textbf{Practical Implications}: The high accuracy and interpretability make this approach suitable for real-world applications, including mobile identification apps and educational tools.
 \end{enumerate}
 
@@ -372,7 +374,7 @@ Our implementation provides several technical contributions:
 \begin{itemize}
     \item Automated hyperparameter optimization workflow using Optuna
     \item Comprehensive explainability pipeline combining multiple interpretability methods
-    \item Efficient preprocessing pipeline handling mixed data types and missing values
+    \item Efficient preprocessing pipeline handling mixed data types and \texttt{unknown} values
     \item Reproducible research framework with complete artifact generation
 \end{itemize}
 
@@ -381,45 +383,46 @@ Our implementation provides several technical contributions:
 While the results are promising, several limitations should be acknowledged:
 
 \begin{enumerate}
-    \item The dataset, while comprehensive, may not represent all mushroom species globally
-    \item External validation on independent datasets would strengthen generalizability claims
-    \item Integration with computer vision for automated morphological feature extraction could enhance practical applicability
+    \item The dataset, while comprehensive, may not represent all mushroom species globally.
+    \item External validation on independent datasets would strengthen generalizability claims.
+    \item Integration with computer vision for automated morphological feature extraction could enhance practical applicability.
 \end{enumerate}
 
 \subsection{Future Directions}
 
 Future research directions include:
 \begin{itemize}
-    \item \textbf{Ensemble Methods}: Combining multiple models (CatBoost, XGBoost, Random Forest) for improved robustness
-    \item \textbf{External Validation}: Testing on independent mushroom datasets from different geographical regions
-    \item \textbf{Multi-class Extension}: Expanding to species-level classification beyond binary toxicity
-    \item \textbf{Real-time Applications}: Developing mobile applications with integrated image recognition capabilities
+    \item \textbf{Ensemble Methods}: Combining multiple models (CatBoost, XGBoost, Random Forest) for improved robustness.
+    \item \textbf{External Validation}: Testing on independent mushroom datasets from different geographical regions.
+    \item \textbf{Multi-class Extension}: Expanding to species-level classification beyond binary toxicity.
+    \item \textbf{Real-time Applications}: Developing mobile applications with integrated image recognition capabilities.
 \end{itemize}
 
 The mushroom classification problem demonstrates the importance of combining high predictive accuracy with comprehensive explainability analysis. Our approach provides a foundation for safe, interpretable automated mushroom identification systems with potential applications in public health, education, and mycological research.
 
 \begin{thebibliography}{9}
 
-\bibitem{who2016mushroom}
-World Health Organization. (2016). \textit{Mushroom poisoning: Guidelines for diagnosis and management}. WHO Press.
+\bibitem{who2023naturaltoxins}
+World Health Organization. \textit{Natural Toxins in Food} (Fact-sheet). 
+10 March 2023. Available at \url{https://www.who.int/news-room/fact-sheets/detail/natural-toxins-in-food}.
 
 \bibitem{schlimmer1987concept}
-Schlimmer, J. S. (1987). Concept acquisition through representational adjustment. \textit{Doctoral dissertation, University of California}, Irvine.
+Schlimmer, J.\ S. (1987). Concept acquisition through representational adjustment. \textit{Doctoral dissertation, University of California}, Irvine.
 
 \bibitem{kaggle2019mushroom}
-Kaggle Community. (2019). Mushroom Classification Competition. \textit{Kaggle Platform}. Retrieved from https://www.kaggle.com/competitions/mushroom-classification
+Kaggle Community. (2019). Mushroom Classification Competition. \textit{Kaggle Platform}. Retrieved from \url{https://www.kaggle.com/competitions/mushroom-classification}
 
 \bibitem{chen2016xgboost}
 Chen, T., \& Guestrin, C. (2016). XGBoost: A scalable tree boosting system. \textit{Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining}, 785-794.
 
 \bibitem{prokhorenkova2018catboost}
-Prokhorenkova, L., Gusev, G., Vorobev, A., Dorogush, A. V., \& Gulin, A. (2018). CatBoost: unbiased boosting with categorical features. \textit{Advances in Neural Information Processing Systems}, 6638-6648.
+Prokhorenkova, L., Gusev, G., Vorobev, A., Dorogush, A.\ V., \& Gulin, A. (2018). CatBoost: Unbiased boosting with categorical features. \textit{Advances in Neural Information Processing Systems}, 6638-6648.
 
 \bibitem{lundberg2017shap}
-Lundberg, S. M., \& Lee, S. I. (2017). A unified approach to interpreting model predictions. \textit{Advances in Neural Information Processing Systems}, 4765-4774.
+Lundberg, S.\ M., \& Lee, S.\ I. (2017). A unified approach to interpreting model predictions. \textit{Advances in Neural Information Processing Systems}, 4765-4774.
 
 \bibitem{akiba2019optuna}
-Akiba, T., Sano, S., Yanase, T, Ohta, T., \& Koyama, M. (2019). Optuna: A next-generation hyperparameter optimization framework. \textit{Proceedings of the 25th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining}, 2623-2631.
+Akiba, T., Sano, S., Yanase, T., Ohta, T., \& Koyama, M. (2019). Optuna: A next-generation hyperparameter optimization framework. \textit{Proceedings of the 25th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining}, 2623-2631.
 
 \bibitem{breiman2001random}
 Breiman, L. (2001). Random forests. \textit{Machine Learning}, 45(1), 5-32.
